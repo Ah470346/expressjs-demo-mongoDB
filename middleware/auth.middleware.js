@@ -1,5 +1,5 @@
 
-var db = require('../db');
+const User = require('../models/users.model.js');
 
 module.exports.requireAuth = function(req , res , next){
 	if(!req.signedCookies.userID){
@@ -7,12 +7,13 @@ module.exports.requireAuth = function(req , res , next){
 		return;
 	}
 
-	var user = db.get('users').find({id: req.signedCookies.userID}).value();
-
-	if(!user){
-		res.redirect('/auth/login');
-		return;
-	}
-	res.locals.user = user;
-	next();
+	// var user = db.get('users').find({id: req.signedCookies.userID}).value();
+	User.findOne({_id: req.signedCookies.userID},function(err,user){
+		if(!user){
+			res.redirect('/auth/login');
+			return;
+		}
+		res.locals.user = user;
+		next();
+	})
 }
